@@ -1,0 +1,23 @@
+{
+  "name": "state-machine-experiment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha test/**/*.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bunyan": "^1.8.15",
+    "xstate": "^4.38.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.10",
+    "eslint": "^8.2.0",
+    "mocha": "^10.2.0",
+    "sinon": "^17.0.1"
+  }
+}
