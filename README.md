@@ -1,7 +1,5 @@
 # State Machine Experiment
 
-## Overview
-
 This repository demonstrates the use of a state machine to control a complex purchase flow involving retries and rollback actions. It's designed to showcase best practices in software design and architecture, particularly in the context of handling intricate business logic and transaction flows.
 
 ## Installation
