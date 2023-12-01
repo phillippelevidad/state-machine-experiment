@@ -1,6 +1,6 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
-import { CreditFlowActions } from "../src/internal/CreditFlowActions.js";
+import { CreditFlowActions } from "../src/CreditFlowActions.js";
 import { CreditFlow } from "../src/CreditFlow.js";
 import { Database } from "../src/Database.js";
 import { PaymentGateway } from "../src/PaymentGateway.js";

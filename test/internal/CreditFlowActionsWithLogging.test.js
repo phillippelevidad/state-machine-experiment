@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { CreditFlowActions } from "../../src/internal/CreditFlowActions.js";
+import { CreditFlowActions } from "../../src/CreditFlowActions.js";
 import { CreditFlowActionsWithLogging } from "../../src/internal/CreditFlowActionsWithLogging.js";
 
 const actions = new CreditFlowActions({});

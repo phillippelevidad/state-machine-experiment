@@ -1,5 +1,5 @@
 import { log } from "../logger.js";
-import { CreditFlowActions } from "./CreditFlowActions.js";
+import { CreditFlowActions } from "../CreditFlowActions.js";
 
 // Uses the Decorator design pattern to add logging
 // capabilities to the credit flow actions. See the PaymentGatewayWithRetries
