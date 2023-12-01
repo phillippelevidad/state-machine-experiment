@@ -55,3 +55,105 @@ https://github.com/statelyai/xstate
 ## Conclusion
 
 This repository serves as a practical example of implementing complex business logic using state machines, adhering to SOLID principles, and effectively utilizing design patterns such as Decorator to enhance functionality.
+
+---
+
+## Tests
+
+```
+  CreditFlow
+    run
+      ✔ successfully executes the whole flow (783ms)
+
+  createCreditFlowMachine
+    ✔ returns a machine
+
+  creditFlowMachine
+    ✔ reaches the `succeeded` state if no errors
+    ✔ invokes all callback functions for the happy path
+    ✔ invokes the `onFailure` callback for any errors
+    ✔ reaches the `failedWithSuccessfulRollback` state for a failure with successful rollback
+    ✔ reaches the `failedPendingReview` state for a failure with a failed rollback
+    ✔ invokes the `rollbackFromPaymentFailure` callback for a payment failure
+    ✔ invokes the `rollbackFromCryptoFailure` callback for a crypto failure
+    ✔ invokes the `rollbackFromWithdrawFailure` callback for a withdraw failure
+
+  CreditFlowActions
+    start
+      ✔ registers a new credit transaction
+      ✔ returns userInfo and transactionId
+    processPayment
+      ✔ pays using payment gateway
+      ✔ updates transaction with payment result
+    exchangeCrypto
+      ✔ purchases crypto
+      ✔ sells crypto
+      ✔ updates transaction with crypto purchase and sale results
+    processWithdraw
+      ✔ sends money using pix
+      ✔ updates transaction with withdraw result
+    rollbackFromPaymentFailure
+      ✔ updates transaction with the rollback result
+    rollbackFromCryptoFailure
+      ✔ refunds payment
+      ✔ updates transaction with the rollback result
+      ✔ calls rollbackFromPaymentFailure
+    rollbackFromWithdrawFailure
+      ✔ updates transaction with the rollback result
+      ✔ calls rollbackFromCryptoFailure
+    onSuccess
+      ✔ updates transaction with the transaction result
+    onFailure
+      ✔ updates transaction with the transaction result
+
+  CreditFlowActionsWithLogging
+    start
+      ✔ calls the credit flow actions' start method
+    processPayment
+      ✔ calls the credit flow actions' processPayment method
+    exchangeCrypto
+      ✔ calls the credit flow actions' exchangeCrypto method
+    processWithdraw
+      ✔ calls the credit flow actions' processWithdraw method
+    rollbackFromPaymentFailure
+      ✔ calls the credit flow actions' rollbackFromPaymentFailure method
+    rollbackFromCryptoFailure
+      ✔ calls the credit flow actions' rollbackFromCryptoFailure method
+    rollbackFromWithdrawFailure
+      ✔ calls the credit flow actions' rollbackFromWithdrawFailure method
+    onSuccess
+      ✔ calls the credit flow actions' onSuccess method
+    onFailure
+      ✔ calls the credit flow actions' onFailure method
+
+  PaymentGatewayWithIdempotency
+    pay
+      ✔ calls the payment gateway's pay method (108ms)
+      ✔ does not call the payment gateway's pay method twice for the same parameters (70ms)
+      ✔ calls the payment gateway's pay method twice for different parameters (160ms)
+    refund
+      ✔ calls the payment gateway's refund method (99ms)
+    sendMoneyUsingPix
+      ✔ calls the payment gateway's sendMoneyUsingPix method (101ms)
+      ✔ does not call the payment gateway's sendMoneyUsingPix method twice for the same parameters (65ms)
+      ✔ calls the payment gateway's sendMoneyUsingPix method twice for different parameters (161ms)
+
+  PaymentGatewayWithRetries
+    pay
+      ✔ calls the payment gateway's pay method (96ms)
+    refund
+      ✔ calls the payment gateway's refund method (68ms)
+    sendMoneyUsingPix
+      ✔ calls the payment gateway's sendMoneyUsingPix method (59ms)
+
+  util
+    simulateAsyncOperation
+      ✔ returns a promise
+      ✔ resolves with the return value of the success callback (94ms)
+      ✔ rejects with the return value of the error callback (103ms)
+    generateIdempotencyKey
+      ✔ returns a string
+      ✔ returns a different key for different objects
+      ✔ returns the same key for the same object
+      ✔ returns the same key for the same object with different key order
+```
