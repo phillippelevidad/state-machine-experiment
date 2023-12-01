@@ -24,11 +24,11 @@ npm run test
 
 Start exploring the code from the `CreditFlow` class located in the `src/CreditFlow.js` file. This class is central to the state machine implementation and orchestrates the purchase flow.
 
+The main classes here are `CreditFlow` and `CreditFlowActions`. Also, the state machine definition, which resides in the `src/internal/createCreditFlowMachine.js` file.
+
 ## Usage
 
 Refer to the `CreditFlow.test.js` file in the test directory for examples on how to use the `CreditFlow` class. This file one integration test demonstrating how to setup and run the purchase flow.
-
-The main classes here are `CreditFlow` and `CreditFlowActions`. Also, the state machine definition, which resides in the `src/internal/createCreditFlowMachine.js` file.
 
 ## SOLID Practices
 
