@@ -26,6 +26,9 @@ export function createCreditFlowMachine({
     },
     initial: "idle",
     states: {
+      // The machine starts in the idle state.
+      // Upon receiving the START event, it stores the userId and amount
+      // in the context and then it transitions automatically to the starting state.
       idle: {
         on: {
           START: {
@@ -37,6 +40,10 @@ export function createCreditFlowMachine({
           },
         },
       },
+      // The starting state invokes the start action.
+      // If the action succeeds, it transitions to the processingPayment state.
+      // If the action fails, it transitions to the failedWithSuccessfulRollback state.
+      // Every state has an entry and exit action that updates the context with the current state.
       starting: {
         ...invokeFor("starting", {
           action: start,
@@ -45,6 +52,9 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("starting"),
       },
+      // The processingPayment state invokes the processPayment action.
+      // If the action succeeds, it transitions to the paymentProcessed state.
+      // If the action fails, it transitions to the paymentFailed state.
       processingPayment: {
         ...invokeFor("processingPayment", {
           action: processPayment,
@@ -53,10 +63,16 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("processingPayment"),
       },
+      // The paymentProcessed is meant to be a transient state,
+      // so it doesn't invoke any action. Right after entering this state,
+      // it transitions to the exchangingCrypto state.
       paymentProcessed: {
         always: "exchangingCrypto",
         ...entryAndExitActionsFor("paymentProcessed"),
       },
+      // The exchangingCrypto state invokes the exchangeCrypto action.
+      // If the action succeeds, it transitions to the cryptoExchanged state.
+      // If the action fails, it transitions to the cryptoFailed state.
       exchangingCrypto: {
         ...invokeFor("exchangingCrypto", {
           action: exchangeCrypto,
@@ -65,10 +81,16 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("exchangingCrypto"),
       },
+      // The cryptoExchanged is meant to be a transient state,
+      // so it doesn't invoke any action. Right after entering this state,
+      // it transitions to the processingWithdraw state.
       cryptoExchanged: {
         always: "processingWithdraw",
         ...entryAndExitActionsFor("cryptoExchanged"),
       },
+      // The processingWithdraw state invokes the processWithdraw action.
+      // If the action succeeds, it transitions to the withdrawProcessed state.
+      // If the action fails, it transitions to the withdrawFailed state.
       processingWithdraw: {
         ...invokeFor("processingWithdraw", {
           action: processWithdraw,
@@ -77,10 +99,16 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("processingWithdraw"),
       },
+      // The withdrawProcessed is meant to be a transient state,
+      // so it doesn't invoke any action. Right after entering this state,
+      // it transitions to the succeeded state.
       withdrawProcessed: {
         always: "succeeded",
         ...entryAndExitActionsFor("withdrawProcessed"),
       },
+      // The paymentFailed state invokes the rollbackFromPaymentFailure action.
+      // If the action succeeds, it transitions to the failedWithSuccessfulRollback state.
+      // If the action fails, it transitions to the failedPendingReview state.
       paymentFailed: {
         ...invokeFor("paymentFailed", {
           action: rollbackFromPaymentFailure,
@@ -89,6 +117,9 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("paymentFailed"),
       },
+      // The cryptoFailed state invokes the rollbackFromCryptoFailure action.
+      // If the action succeeds, it transitions to the failedWithSuccessfulRollback state.
+      // If the action fails, it transitions to the failedPendingReview state.
       cryptoFailed: {
         ...invokeFor("cryptoFailed", {
           action: rollbackFromCryptoFailure,
@@ -97,6 +128,9 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("cryptoFailed"),
       },
+      // The withdrawFailed state invokes the rollbackFromWithdrawFailure action.
+      // If the action succeeds, it transitions to the failedWithSuccessfulRollback state.
+      // If the action fails, it transitions to the failedPendingReview state.
       withdrawFailed: {
         ...invokeFor("withdrawFailed", {
           action: rollbackFromWithdrawFailure,
@@ -105,6 +139,10 @@ export function createCreditFlowMachine({
         }),
         ...entryAndExitActionsFor("withdrawFailed"),
       },
+      // The succeeded state invokes the onSuccess action.
+      // This is a final state, so it doesn't transition to any other state,
+      // unless there is an error in the onSuccess action, in which case
+      // it transitions to the failedPendingReview state.
       succeeded: {
         type: "final",
         ...invokeFor("succeeded", {
@@ -113,6 +151,10 @@ export function createCreditFlowMachine({
         }),
         ...entryActionForFinal("succeeded"),
       },
+      // The failedWithSuccessfulRollback state invokes the onFailure action.
+      // This is a final state, so it doesn't transition to any other state,
+      // unless there is an error in the onFailure action, in which case
+      // it transitions to the failedPendingReview state.
       failedWithSuccessfulRollback: {
         type: "final",
         ...invokeFor("failedWithSuccessfulRollback", {
@@ -121,6 +163,10 @@ export function createCreditFlowMachine({
         }),
         ...entryActionForFinal("failedWithSuccessfulRollback"),
       },
+      // The failedPendingReview state invokes the onFailure action.
+      // This is a final state, so it doesn't transition to any other state.
+      // It is meant to be a state where a human can review the error and
+      // decide what to do next.
       failedPendingReview: {
         type: "final",
         ...invokeFor("failedPendingReview", {
