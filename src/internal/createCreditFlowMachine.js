@@ -38,69 +38,31 @@ export function createCreditFlowMachine({
         },
       },
       starting: {
-        invoke: {
-          id: "starting",
-          src: (context, event) =>
-            callHandlerWithContext(start, context, event),
-          onDone: {
-            target: "processingPayment",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "failedWithSuccessfulRollback",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("starting", {
+          action: start,
+          onDone: "processingPayment",
+          onError: "failedWithSuccessfulRollback",
+        }),
         ...entryAndExitActionsFor("starting"),
       },
       processingPayment: {
-        invoke: {
-          id: "processingPayment",
-          src: (context, event) =>
-            callHandlerWithContext(processPayment, context, event),
-          onDone: {
-            target: "paymentProcessed",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "paymentFailed",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("processingPayment", {
+          action: processPayment,
+          onDone: "paymentProcessed",
+          onError: "paymentFailed",
+        }),
         ...entryAndExitActionsFor("processingPayment"),
       },
       paymentProcessed: {
         always: "exchangingCrypto",
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "paymentProcessed",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("paymentProcessed"),
       },
       exchangingCrypto: {
-        invoke: {
-          id: "exchangingCrypto",
-          src: (context, event) =>
-            callHandlerWithContext(exchangeCrypto, context, event),
-          onDone: {
-            target: "cryptoExchanged",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "cryptoFailed",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("exchangingCrypto", {
+          action: exchangeCrypto,
+          onDone: "cryptoExchanged",
+          onError: "cryptoFailed",
+        }),
         ...entryAndExitActionsFor("exchangingCrypto"),
       },
       cryptoExchanged: {
@@ -108,19 +70,11 @@ export function createCreditFlowMachine({
         ...entryAndExitActionsFor("cryptoExchanged"),
       },
       processingWithdraw: {
-        invoke: {
-          id: "processingWithdraw",
-          src: (context, event) =>
-            callHandlerWithContext(processWithdraw, context, event),
-          onDone: {
-            target: "withdrawProcessed",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "withdrawFailed",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("processingWithdraw", {
+          action: processWithdraw,
+          onDone: "withdrawProcessed",
+          onError: "withdrawFailed",
+        }),
         ...entryAndExitActionsFor("processingWithdraw"),
       },
       withdrawProcessed: {
@@ -128,102 +82,71 @@ export function createCreditFlowMachine({
         ...entryAndExitActionsFor("withdrawProcessed"),
       },
       paymentFailed: {
-        invoke: {
-          id: "paymentFailed",
-          src: (context, event) =>
-            callHandlerWithContext(rollbackFromPaymentFailure, context, event),
-          onDone: {
-            target: "failedWithSuccessfulRollback",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "failedPendingReview",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("paymentFailed", {
+          action: rollbackFromPaymentFailure,
+          onDone: "failedWithSuccessfulRollback",
+          onError: "failedPendingReview",
+        }),
         ...entryAndExitActionsFor("paymentFailed"),
       },
       cryptoFailed: {
-        invoke: {
-          id: "cryptoFailed",
-          src: (context, event) =>
-            callHandlerWithContext(rollbackFromCryptoFailure, context, event),
-          onDone: {
-            target: "failedWithSuccessfulRollback",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "failedPendingReview",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("cryptoFailed", {
+          action: rollbackFromCryptoFailure,
+          onDone: "failedWithSuccessfulRollback",
+          onError: "failedPendingReview",
+        }),
         ...entryAndExitActionsFor("cryptoFailed"),
       },
       withdrawFailed: {
-        invoke: {
-          id: "withdrawFailed",
-          src: (context, event) =>
-            callHandlerWithContext(rollbackFromWithdrawFailure, context, event),
-          onDone: {
-            target: "failedWithSuccessfulRollback",
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "failedPendingReview",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("withdrawFailed", {
+          action: rollbackFromWithdrawFailure,
+          onDone: "failedWithSuccessfulRollback",
+          onError: "failedPendingReview",
+        }),
         ...entryAndExitActionsFor("withdrawFailed"),
       },
       succeeded: {
         type: "final",
-        invoke: {
-          id: "succeeded",
-          src: (context, event) =>
-            callHandlerWithContext(onSuccess, context, event),
-          onDone: {
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "failedPendingReview",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("succeeded", {
+          action: onSuccess,
+          onError: "failedPendingReview",
+        }),
         ...entryActionForFinal("succeeded"),
       },
       failedWithSuccessfulRollback: {
         type: "final",
-        invoke: {
-          id: "failedWithSuccessfulRollback",
-          src: (context, event) =>
-            callHandlerWithContext(onFailure, context, event),
-          onDone: {
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            target: "failedPendingReview",
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("failedWithSuccessfulRollback", {
+          action: onFailure,
+          onError: "failedPendingReview",
+        }),
         ...entryActionForFinal("failedWithSuccessfulRollback"),
       },
       failedPendingReview: {
         type: "final",
-        invoke: {
-          id: "failedPendingReview",
-          src: (context, event) =>
-            callHandlerWithContext(onFailure, context, event),
-          onDone: {
-            actions: assign((context, event) => ({ ...event.data })),
-          },
-          onError: {
-            actions: assign((context, event) => ({ error: event.data })),
-          },
-        },
+        ...invokeFor("failedPendingReview", {
+          action: onFailure,
+        }),
         ...entryActionForFinal("failedPendingReview"),
       },
     },
   });
+}
+
+function invokeFor(state, { action, onDone, onError }) {
+  return {
+    invoke: {
+      id: state,
+      src: (context, event) => callHandlerWithContext(action, context, event),
+      onDone: {
+        target: onDone,
+        actions: assign((context, event) => ({ ...event.data })),
+      },
+      onError: {
+        target: onError,
+        actions: assign((context, event) => ({ error: event.data })),
+      },
+    },
+  };
 }
 
 function callHandlerWithContext(handler, context, event) {
@@ -237,12 +160,12 @@ function callHandlerWithContext(handler, context, event) {
   });
 }
 
-function entryAndExitActionsFor(stateName) {
+function entryAndExitActionsFor(state) {
   return {
     entry: [
       assign({
         lastUpdated: () => Date.now(),
-        currentState: stateName,
+        currentState: state,
       }),
     ],
     exit: [
@@ -257,13 +180,13 @@ function entryAndExitActionsFor(stateName) {
   };
 }
 
-function entryActionForFinal(stateName) {
+function entryActionForFinal(state) {
   return {
     entry: [
       assign({
         lastUpdated: () => Date.now(),
-        currentState: stateName,
-        stateHistory: (context) => [...context.stateHistory, stateName],
+        currentState: state,
+        stateHistory: (context) => [...context.stateHistory, state],
       }),
     ],
   };
