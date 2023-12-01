@@ -63,7 +63,7 @@ This repository serves as a practical example of implementing complex business l
 ```
   CreditFlow
     run
-      ✔ successfully executes the whole flow (783ms)
+      ✔ successfully executes the whole flow
 
   createCreditFlowMachine
     ✔ returns a machine
@@ -128,29 +128,29 @@ This repository serves as a practical example of implementing complex business l
 
   PaymentGatewayWithIdempotency
     pay
-      ✔ calls the payment gateway's pay method (108ms)
-      ✔ does not call the payment gateway's pay method twice for the same parameters (70ms)
-      ✔ calls the payment gateway's pay method twice for different parameters (160ms)
+      ✔ calls the payment gateway's pay method
+      ✔ does not call the payment gateway's pay method twice for the same parameters
+      ✔ calls the payment gateway's pay method twice for different parameters
     refund
-      ✔ calls the payment gateway's refund method (99ms)
+      ✔ calls the payment gateway's refund method
     sendMoneyUsingPix
-      ✔ calls the payment gateway's sendMoneyUsingPix method (101ms)
-      ✔ does not call the payment gateway's sendMoneyUsingPix method twice for the same parameters (65ms)
-      ✔ calls the payment gateway's sendMoneyUsingPix method twice for different parameters (161ms)
+      ✔ calls the payment gateway's sendMoneyUsingPix method
+      ✔ does not call the payment gateway's sendMoneyUsingPix method twice for the same parameters
+      ✔ calls the payment gateway's sendMoneyUsingPix method twice for different parameters
 
   PaymentGatewayWithRetries
     pay
-      ✔ calls the payment gateway's pay method (96ms)
+      ✔ calls the payment gateway's pay method
     refund
-      ✔ calls the payment gateway's refund method (68ms)
+      ✔ calls the payment gateway's refund method
     sendMoneyUsingPix
-      ✔ calls the payment gateway's sendMoneyUsingPix method (59ms)
+      ✔ calls the payment gateway's sendMoneyUsingPix method
 
   util
     simulateAsyncOperation
       ✔ returns a promise
-      ✔ resolves with the return value of the success callback (94ms)
-      ✔ rejects with the return value of the error callback (103ms)
+      ✔ resolves with the return value of the success callback
+      ✔ rejects with the return value of the error callback
     generateIdempotencyKey
       ✔ returns a string
       ✔ returns a different key for different objects
