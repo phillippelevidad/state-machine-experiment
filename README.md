@@ -65,7 +65,7 @@ This repository serves as a practical example of implementing complex business l
 ```
   CreditFlow
     run
-      ✔ successfully executes the whole flow
+      ✔ successfully executes the whole flow and returns the expected object shape
 
   createCreditFlowMachine
     ✔ returns a machine

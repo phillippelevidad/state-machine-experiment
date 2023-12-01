@@ -8,7 +8,7 @@ import { CryptoGateway } from "../src/CryptoGateway.js";
 
 describe("CreditFlow", () => {
   describe("run", () => {
-    it("successfully executes the whole flow", async () => {
+    it("successfully executes the whole flow and returns the expected object shape", async () => {
       const actions = new CreditFlowActions({
         database: new Database(),
         paymentGateway: new PaymentGateway(),
@@ -72,7 +72,6 @@ describe("CreditFlow", () => {
           pixId: "some-pix-id",
           status: "success",
         },
-        type: "",
       };
       const result = await flow.run(data);
       expect(objectsHaveSameStructure(result, expected)).to.be.true;

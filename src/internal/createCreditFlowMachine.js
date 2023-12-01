@@ -197,9 +197,11 @@ function invokeFor(state, { action, onDone, onError }) {
 
 function callHandlerWithContext(handler, context, event) {
   const isError = context.currentState.includes("failed");
+  // eslint-disable-next-line no-unused-vars
+  const { type, ...eventWithoutType } = event;
   return handler?.({
     ...context,
-    ...event,
+    ...eventWithoutType,
     isError,
     isSuccess: context.currentState.includes("succeeded"),
     error: isError ? context.error ?? event.data ?? "Unknown error" : null,
