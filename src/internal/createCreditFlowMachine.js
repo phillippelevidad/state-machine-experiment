@@ -51,21 +51,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "starting",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("starting"),
       },
       processingPayment: {
         invoke: {
@@ -81,21 +67,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "processingPayment",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("processingPayment"),
       },
       paymentProcessed: {
         always: "exchangingCrypto",
@@ -129,39 +101,11 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "exchangingCrypto",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("exchangingCrypto"),
       },
       cryptoExchanged: {
         always: "processingWithdraw",
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "cryptoExchanged",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("cryptoExchanged"),
       },
       processingWithdraw: {
         invoke: {
@@ -177,39 +121,11 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "processingWithdraw",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("processingWithdraw"),
       },
       withdrawProcessed: {
         always: "succeeded",
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "withdrawProcessed",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("withdrawProcessed"),
       },
       paymentFailed: {
         invoke: {
@@ -225,21 +141,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "paymentFailed",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("paymentFailed"),
       },
       cryptoFailed: {
         invoke: {
@@ -255,21 +157,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "cryptoFailed",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("cryptoFailed"),
       },
       withdrawFailed: {
         invoke: {
@@ -285,21 +173,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "withdrawFailed",
-          }),
-        ],
-        exit: [
-          assign({
-            lastUpdated: () => Date.now(),
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              context.currentState,
-            ],
-          }),
-        ],
+        ...entryAndExitActionsFor("withdrawFailed"),
       },
       succeeded: {
         type: "final",
@@ -315,13 +189,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "succeeded",
-            stateHistory: (context) => [...context.stateHistory, "succeeded"],
-          }),
-        ],
+        ...entryActionForFinal("succeeded"),
       },
       failedWithSuccessfulRollback: {
         type: "final",
@@ -337,16 +205,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "failedWithSuccessfulRollback",
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              "failedWithSuccessfulRollback",
-            ],
-          }),
-        ],
+        ...entryActionForFinal("failedWithSuccessfulRollback"),
       },
       failedPendingReview: {
         type: "final",
@@ -361,16 +220,7 @@ export function createCreditFlowMachine({
             actions: assign((context, event) => ({ error: event.data })),
           },
         },
-        entry: [
-          assign({
-            lastUpdated: () => Date.now(),
-            currentState: "failedPendingReview",
-            stateHistory: (context) => [
-              ...context.stateHistory,
-              "failedPendingReview",
-            ],
-          }),
-        ],
+        ...entryActionForFinal("failedPendingReview"),
       },
     },
   });
@@ -385,4 +235,36 @@ function callHandlerWithContext(handler, context, event) {
     isSuccess: context.currentState.includes("succeeded"),
     error: isError ? context.error ?? event.data ?? "Unknown error" : null,
   });
+}
+
+function entryAndExitActionsFor(stateName) {
+  return {
+    entry: [
+      assign({
+        lastUpdated: () => Date.now(),
+        currentState: stateName,
+      }),
+    ],
+    exit: [
+      assign({
+        lastUpdated: () => Date.now(),
+        stateHistory: (context) => [
+          ...context.stateHistory,
+          context.currentState,
+        ],
+      }),
+    ],
+  };
+}
+
+function entryActionForFinal(stateName) {
+  return {
+    entry: [
+      assign({
+        lastUpdated: () => Date.now(),
+        currentState: stateName,
+        stateHistory: (context) => [...context.stateHistory, stateName],
+      }),
+    ],
+  };
 }
